@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import { connect } from "react-redux";
+import { labTestUpdate } from "../../src/actions/patientActions";
 import {
   Text,
   View,
@@ -16,7 +18,38 @@ import * as Animatable from "react-native-animatable";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Feather from "react-native-vector-icons/Feather";
 
-const Details = () => {
+const Details = (props) => {
+  const [lab, setLab] = useState({
+    lab_results: null,
+  });
+
+  const {
+    firstname,
+    lastname,
+    contact,
+    emergencyContact,
+    joinedAt,
+    area_of_residence,
+    lab_results,
+    consultation,
+    _id,
+  } = props.route.params;
+
+  const { lab_tests } = consultation.diagnosis;
+
+  let tests;
+  const testToArr = lab_tests.split(",");
+  console.log(props, testToArr, lab_tests);
+
+  testToArr.forEach((test) => {
+    tests = <Text>{test}</Text>;
+    return tests;
+  });
+
+  const _onChangeText = (name) => {
+    return (text) => setLab({ ...lab, [name]: text });
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -31,6 +64,7 @@ const Details = () => {
               placeholder="Name"
               style={styles.input}
               multiline={true}
+              value={`${firstname} ${lastname}`}
             />
           </View>
 
@@ -39,11 +73,7 @@ const Details = () => {
           </Text>
           <View style={styles.divider}></View>
 
-          <View>
-            <Text>Lorem, ipsum dolor.</Text>
-            <Text>Lorem, ipsum dolor.</Text>
-            <Text>Lorem, ipsum dolor.</Text>
-          </View>
+          <View>{tests}</View>
 
           <Text style={[styles.dividerText, { marginTop: 20 }]}>
             Tests Outcome
@@ -55,12 +85,13 @@ const Details = () => {
               placeholder="Tests Outcome"
               style={styles.input}
               multiline={true}
+              onChangeText={_onChangeText("lab_results")}
             />
           </View>
 
           <View>
             <LinearGradient colors={["#333", "#222"]} style={styles.submit_btn}>
-              <TouchableOpacity onPress={() => console.log("pressed")}>
+              <TouchableOpacity onPress={() => props.labTestUpdate(lab, _id)}>
                 <Text style={{ color: "#fff", textAlign: "center" }}>
                   Submit
                 </Text>
@@ -140,4 +171,9 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Details;
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+  patients: state.patients,
+  errors: state.errors,
+});
+export default connect(mapStateToProps, { labTestUpdate })(Details);

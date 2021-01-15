@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import { connect } from "react-redux";
+import { diagnosePatient } from "../../src/actions/patientActions";
 import {
   Text,
   View,
@@ -8,6 +10,7 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
+  Button,
 } from "react-native";
 
 import { LinearGradient } from "expo-linear-gradient";
@@ -16,7 +19,26 @@ import * as Animatable from "react-native-animatable";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Feather from "react-native-vector-icons/Feather";
 
-const Details = () => {
+const Details = (props) => {
+  const [diagnose, setDiagnose] = useState({
+    symptoms: null,
+    referToLab: "no",
+    lab_tests: null,
+    prescriptions: null,
+  });
+  const {
+    firstname,
+    lastname,
+
+    lab_results,
+
+    _id,
+  } = props.route.params;
+
+  const _onChangeText = (name) => {
+    return (text) => setDiagnose({ ...diagnose, [name]: text });
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -31,6 +53,7 @@ const Details = () => {
               placeholder="Name"
               style={styles.input}
               multiline={true}
+              value={`${firstname} ${lastname}`}
             />
           </View>
 
@@ -43,6 +66,7 @@ const Details = () => {
               placeholder="Symptoms"
               style={styles.input}
               multiline={true}
+              onChangeText={_onChangeText("symptoms")}
             />
           </View>
 
@@ -53,56 +77,86 @@ const Details = () => {
               <TextInput
                 multiline={true}
                 placeholder="Yes/No"
-                style={styles.input}
+                style={[styles.input, { textTransform: "lowercase" }]}
+                onChangeText={_onChangeText("referToLab")}
               />
             </View>
           </View>
 
-          <Text style={[styles.dividerText, { marginTop: 20 }]}>
-            Tests to handle
-          </Text>
-          <View style={styles.divider}></View>
+          {diagnose.referToLab === "yes" || diagnose.referToLab === "Yes" ? (
+            <View>
+              <Text style={[styles.dividerText, { marginTop: 20 }]}>
+                Tests to handle
+              </Text>
+              <View style={styles.divider}></View>
 
-          <View style={[styles.form_group]}>
-            <Feather name="user" size={20} />
-            <TextInput
-              multiline={true}
-              placeholder="Tests To Perform"
-              style={styles.input}
-            />
-          </View>
+              <View style={[styles.form_group]}>
+                <Feather name="user" size={20} />
+                <TextInput
+                  multiline={true}
+                  placeholder="Tests To Perform"
+                  style={styles.input}
+                  onChangeText={_onChangeText("lab_tests")}
+                />
+              </View>
+            </View>
+          ) : null}
 
           <Text style={[styles.dividerText, { marginTop: 20 }]}>
             Lab Results
           </Text>
-
           <View style={styles.divider}></View>
-          <View style={styles.lab_results}>
-            <Text>Lab Results</Text>
-            <Text>Lorem, ipsum dolor.</Text>
-            <Text>Lorem, ipsum dolor.</Text>
-          </View>
+          {lab_results.paidForLab && lab_results.titles !== "" ? (
+            <View>
+              <View style={styles.lab_results}>
+                <Button
+                  title="View Test Results"
+                  onPress={() => {
+                    props.navigation.navigate(
+                      "Lab Details",
+                      props.route.params
+                    );
+                  }}
+                />
+              </View>
+            </View>
+          ) : (
+            <Text>Test results not ready</Text>
+          )}
 
-          <Text style={[styles.dividerText, { marginTop: 20 }]}>
-            Prescriptions
-          </Text>
-          <View style={styles.divider}></View>
+          {diagnose.referToLab === "no" ? (
+            <View>
+              <Text style={[styles.dividerText, { marginTop: 20 }]}>
+                Prescriptions
+              </Text>
+              <View style={styles.divider}></View>
 
-          <View style={[styles.form_group]}>
-            <Feather name="user" size={20} />
-            <TextInput
-              multiline={true}
-              placeholder="Prescription"
-              style={styles.input}
-            />
-          </View>
+              <View style={[styles.form_group]}>
+                <Feather name="user" size={20} />
+                <TextInput
+                  multiline={true}
+                  placeholder="Prescription"
+                  style={styles.input}
+                  onChangeText={_onChangeText("prescriptions")}
+                />
+              </View>
+            </View>
+          ) : null}
 
           <View>
             <LinearGradient colors={["#333", "#222"]} style={styles.submit_btn}>
-              <TouchableOpacity onPress={() => console.log("pressed")}>
-                <Text style={{ color: "#fff", textAlign: "center" }}>
-                  Diagnose
-                </Text>
+              <TouchableOpacity
+                onPress={() => props.diagnosePatient(diagnose, _id)}
+              >
+                {diagnose.referToLab === "yes" ? (
+                  <Text style={{ color: "#fff", textAlign: "center" }}>
+                    Go To Lab
+                  </Text>
+                ) : (
+                  <Text style={{ color: "#fff", textAlign: "center" }}>
+                    Diagnose
+                  </Text>
+                )}
               </TouchableOpacity>
             </LinearGradient>
           </View>
@@ -179,4 +233,9 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Details;
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+  errors: state.errors,
+  patients: state.patients,
+});
+export default connect(mapStateToProps, { diagnosePatient })(Details);

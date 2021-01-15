@@ -1,4 +1,6 @@
 import React from "react";
+import { connect } from "react-redux";
+import { getPatients } from "../../src/actions/patientActions";
 import {
   Text,
   View,
@@ -18,48 +20,78 @@ import * as Animatable from "react-native-animatable";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import Feather from "react-native-vector-icons/Feather";
 
-const Consultation = ({ navigation }) => {
-  return (
-    <View style={styles.container}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text
-            style={{
-              color: "#fff",
-              fontSize: 30,
-              fontWeight: "100",
-              fontFamily: "lato",
-            }}
-          >
-            Consultation
-          </Text>
-        </View>
+class Consultation extends React.Component {
+  componentDidMount() {
+    this.props.getPatients();
+  }
+  render() {
+    const { navigation, patients, isLoading, auth } = this.props;
 
-        <Animatable.View animation="fadeInUpBig">
-          <View style={styles.footer}>
-            <ScrollView>
-              <TouchableOpacity
-                style={styles.card}
-                onPress={() => navigation.navigate("Details")}
-              >
-                <View style={styles.card_body}>
-                  <View style={styles.card_image}></View>
-                  <View style={styles.card_text}>
-                    <Text style={styles.card_title}>Name</Text>
-                    <Text style={styles.card_subText}>
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                      Laborum autem
-                    </Text>
-                  </View>
+    let content;
+
+    if (patients.patients === null || isLoading) {
+      content = <Text>Loading</Text>;
+    } else {
+      content = patients.patients.data.map((patient) => {
+        if (patient.assigned_doctor === auth.user._id) {
+          return (
+            <TouchableOpacity
+              style={{
+                backgroundColor: patient.paid ? "#D4EDDA" : "#F8D7DA",
+                color: patient.paid ? "#588C64" : "#D8ABAF",
+              }}
+              key={patient._id}
+              onPress={() => {
+                return navigation.navigate("Details", patient);
+              }}
+            >
+              <View style={styles.card_body}>
+                <View style={styles.card_image}></View>
+                <View style={styles.card_text}>
+                  <Text
+                    style={(styles.card_title, { textTransform: "capitalize" })}
+                  >
+                    {patient.firstname} {patient.lastname}
+                  </Text>
+                  <Text style={styles.card_subText}>
+                    <Text>Member Since: {patient.joinedAt}</Text>
+                  </Text>
                 </View>
-              </TouchableOpacity>
-            </ScrollView>
+              </View>
+            </TouchableOpacity>
+          );
+        } else {
+          content = <Text>No patient assigned to you</Text>;
+        }
+      });
+    }
+
+    return (
+      <View style={styles.container}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Text
+              style={{
+                color: "#fff",
+                fontSize: 30,
+                fontWeight: "100",
+                fontFamily: "lato",
+              }}
+            >
+              Consultation
+            </Text>
           </View>
-        </Animatable.View>
+
+          <Animatable.View animation="fadeInUpBig">
+            <View style={styles.footer}>
+              <ScrollView>{content}</ScrollView>
+            </View>
+          </Animatable.View>
+        </View>
       </View>
-    </View>
-  );
-};
+    );
+  }
+}
 
 const { width, height } = Dimensions.get("screen");
 const screenWidth = width;
@@ -158,4 +190,9 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Consultation;
+const mapStatesToProps = (state) => ({
+  auth: state.auth,
+  patients: state.patients,
+  errors: state.errors,
+});
+export default connect(mapStatesToProps, { getPatients })(Consultation);

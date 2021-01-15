@@ -1,4 +1,6 @@
 import React from "react";
+import { connect } from "react-redux";
+import { getPatients } from "../../src/actions/patientActions";
 import {
   Text,
   View,
@@ -16,48 +18,87 @@ import * as Animatable from "react-native-animatable";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Feather from "react-native-vector-icons/Feather";
 
-const Laboratory = ({ navigation }) => {
-  return (
-    <View style={styles.container}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text
-            style={{
-              color: "#fff",
-              fontSize: 30,
-              fontWeight: "100",
-              fontFamily: "lato",
-            }}
-          >
-            Laboratory
-          </Text>
-        </View>
+class Laboratory extends React.Component {
+  UNSAFE_componentWillMount() {
+    this.props.getPatients();
+  }
+  render() {
+    const { navigation, patients, isLoading, auth } = this.props;
 
-        <Animatable.View animation="fadeInUpBig">
-          <View style={styles.footer}>
-            <ScrollView>
-              <TouchableOpacity
-                style={styles.card}
-                onPress={() => navigation.navigate("Details")}
-              >
-                <View style={styles.card_body}>
-                  <View style={styles.card_image}></View>
-                  <View style={styles.card_text}>
-                    <Text style={styles.card_title}>Name</Text>
-                    <Text style={styles.card_subText}>
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                      Laborum autem
-                    </Text>
-                  </View>
+    let content;
+
+    if (patients.patients === null || isLoading) {
+      content = <Text>Loading</Text>;
+    } else {
+      content = patients.patients.data.map((patient) => {
+        if (
+          patient.lab_results.paidForLab &&
+          patient.consultation.diagnosis.referToLab
+        ) {
+          return (
+            <TouchableOpacity
+              style={{
+                backgroundColor: patient.lab_results.paidForLab
+                  ? "#D4EDDA"
+                  : "#F8D7DA",
+                color: patient.lab_results.paidForLab ? "#588C64" : "#D8ABAF",
+                borderRightColor: "#D4EDDA",
+                borderRightWidth: 10,
+              }}
+              key={patient._id}
+              onPress={() => {
+                if (patient.lab_results.paidForLab) {
+                  navigation.navigate("Details", patient);
+                }
+              }}
+            >
+              <View style={styles.card_body}>
+                <View style={styles.card_image}></View>
+                <View style={styles.card_text}>
+                  <Text
+                    style={(styles.card_title, { textTransform: "capitalize" })}
+                  >
+                    {patient.firstname} {patient.lastname}
+                  </Text>
+                  <Text style={styles.card_subText}>
+                    <Text>Member Since: {patient.joinedAt}</Text>
+                  </Text>
                 </View>
-              </TouchableOpacity>
-            </ScrollView>
+              </View>
+            </TouchableOpacity>
+          );
+        } else {
+          content = <Text>No patient assigned to you</Text>;
+        }
+      });
+    }
+
+    return (
+      <View style={styles.container}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Text
+              style={{
+                color: "#fff",
+                fontSize: 30,
+                fontWeight: "100",
+                fontFamily: "lato",
+              }}
+            >
+              Laboratory
+            </Text>
           </View>
-        </Animatable.View>
+
+          <Animatable.View animation="fadeInUpBig">
+            <View style={styles.footer}>
+              <ScrollView>{content}</ScrollView>
+            </View>
+          </Animatable.View>
+        </View>
       </View>
-    </View>
-  );
-};
+    );
+  }
+}
 
 const { width, height } = Dimensions.get("screen");
 const screenWidth = width;
@@ -160,4 +201,9 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Laboratory;
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+  patients: state.patients,
+  errors: state.errors,
+});
+export default connect(mapStateToProps, { getPatients })(Laboratory);

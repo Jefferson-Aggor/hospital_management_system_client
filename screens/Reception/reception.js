@@ -1,4 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { connect } from "react-redux";
+import { searchPatients } from "../../src/actions/patientActions";
+import Spinner from "../../src/components/Spinner";
 import {
   Text,
   View,
@@ -6,101 +9,113 @@ import {
   StyleSheet,
   TextInput,
   ScrollView,
+  Button,
+  TouchableOpacity,
 } from "react-native";
 
-const ReceptionScreen = () => {
-  return (
-    <View style={styles.container}>
-      {/* Search Patient */}
-      <View style={styles.form_group}>
-        <TextInput
-          placeholder="Search Patient"
-          placeholderTextColor="#777"
-          style={styles.input}
-        />
-      </View>
-      {/* Search Output */}
+class ReceptionScreen extends React.Component {
+  state = {
+    firstname: null,
+    lastname: null,
+  };
+  // componentDidMount() {
+  //   this.props.getPatients(this.state);
+  // }
 
-      <ScrollView>
-        <View style={styles.search_output}>
-          <Text style={styles.card_title}>People Found</Text>
-          <View style={styles.card}>
-            <View style={styles.card_body}>
-              <View style={styles.card_image}></View>
-              <View style={styles.card_text}>
-                <Text style={styles.card_title}>Name</Text>
-                <Text style={styles.card_subText}>
-                  Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                  Laborum autem
-                </Text>
-              </View>
-            </View>
-          </View>
-          <View style={styles.card}>
-            <View style={styles.card_body}>
-              <View style={styles.card_image}></View>
-              <View style={styles.card_text}>
-                <Text style={styles.card_title}>Name</Text>
-                <Text style={styles.card_subText}>
-                  Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                  Laborum autem
-                </Text>
-              </View>
-            </View>
-          </View>
-          <View style={styles.card}>
-            <View style={styles.card_body}>
-              <View style={styles.card_image}></View>
-              <View style={styles.card_text}>
-                <Text style={styles.card_title}>Name</Text>
-                <Text style={styles.card_subText}>
-                  Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                  Laborum autem
-                </Text>
-              </View>
-            </View>
-          </View>
-          <View style={styles.card}>
-            <View style={styles.card_body}>
-              <View style={styles.card_image}></View>
-              <View style={styles.card_text}>
-                <Text style={styles.card_title}>Name</Text>
-                <Text style={styles.card_subText}>
-                  Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                  Laborum autem
-                </Text>
-              </View>
-            </View>
-          </View>
-          <View style={styles.card}>
-            <View style={styles.card_body}>
-              <View style={styles.card_image}></View>
-              <View style={styles.card_text}>
-                <Text style={styles.card_title}>Name</Text>
-                <Text style={styles.card_subText}>
-                  Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                  Laborum autem
-                </Text>
-              </View>
-            </View>
-          </View>
-          <View style={styles.card}>
-            <View style={styles.card_body}>
-              <View style={styles.card_image}></View>
-              <View style={styles.card_text}>
-                <Text style={styles.card_title}>Name</Text>
-                <Text style={styles.card_subText}>
-                  Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                  Laborum autem
-                </Text>
-              </View>
-            </View>
-          </View>
+  _onChangeText() {
+    return (text) => {
+      const str = text.split(" ");
+
+      this.setState({ ...this.state, firstname: str[0], lastname: str[1] });
+    };
+  }
+
+  render() {
+    const { user } = this.props.auth;
+    const { patient, isLoading } = this.props.patients;
+
+    let content;
+    if (isLoading) {
+      content = <Text>Loading..</Text>;
+    }
+
+    if (patient === null) {
+      content = (
+        <View>
+          <Text>Search Patients</Text>
         </View>
-      </ScrollView>
-    </View>
-  );
-};
+      );
+    } else {
+      if (patient.data.length == 0) {
+        content = (
+          <View>
+            <Text>User not found</Text>
+            <Button
+              onPress={() => this.props.navigation.navigate("Register Patient")}
+              title="Register Patient"
+            />
+          </View>
+        );
+      } else {
+        content = patient.data.map((patient) => {
+          return (
+            <TouchableOpacity
+              style={{
+                backgroundColor: patient.paid ? "#D4EDDA" : "#F8D7DA",
+                color: patient.paid ? "#588C64" : "#D8ABAF",
+              }}
+              key={patient._id}
+              onPress={() => {
+                if (patient.paid) {
+                  this.props.navigation.navigate("Assign Doctor", patient);
+                }
+              }}
+            >
+              <View style={styles.card_body}>
+                <View style={styles.card_image}></View>
+                <View style={styles.card_text}>
+                  <Text
+                    style={(styles.card_title, { textTransform: "capitalize" })}
+                  >
+                    {patient.firstname} {patient.lastname}
+                  </Text>
+                  <Text style={styles.card_subText}>
+                    <Text>Member Since: {patient.joinedAt}</Text>
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          );
+        });
+      }
+    }
+
+    return (
+      <View style={styles.container}>
+        {/* Search Patient */}
+        <View style={styles.form_group}>
+          <TextInput
+            placeholder="Search Patient"
+            placeholderTextColor="#777"
+            style={styles.input}
+            onChangeText={this._onChangeText().bind(this)}
+          />
+          <Button
+            title="Search"
+            onPress={() => {
+              this.props.searchPatients(this.state);
+            }}
+          />
+        </View>
+        {/* Search Output */}
+
+        <ScrollView>
+          <View style={styles.search_output}>{content}</View>
+        </ScrollView>
+      </View>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -173,7 +188,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   card_image: {
-    backgroundColor: "#f18f01ff",
+    backgroundColor: "#fff",
     width: "20%",
   },
   card_text: {
@@ -182,11 +197,17 @@ const styles = StyleSheet.create({
     width: "80%",
   },
   card_title: {
-    color: "#444",
+    // color: "#444",
     fontSize: 20,
     fontWeight: 500,
     marginBottom: 10,
   },
 });
 
-export default ReceptionScreen;
+const mapStatesToProps = (state) => ({
+  auth: state.auth,
+  errors: state.errors,
+  patients: state.patients,
+});
+
+export default connect(mapStatesToProps, { searchPatients })(ReceptionScreen);

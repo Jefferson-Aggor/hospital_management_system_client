@@ -5,6 +5,7 @@ import Feather from "react-native-vector-icons/Feather";
 
 import Consultation from "./consultation";
 import Details from "./details";
+import labDetails from "./labDetails";
 
 const ConsultationTab = createMaterialBottomTabNavigator();
 
@@ -12,7 +13,11 @@ const ConsultationScreen = () => {
   const { Navigator, Screen } = ConsultationTab;
 
   return (
-    <Navigator initialRouteName="Details" activeColor="#fff" shifting={true}>
+    <Navigator
+      initialRouteName="Consultation"
+      activeColor="#fff"
+      shifting={true}
+    >
       <Screen
         name="Consultation"
         component={Consultation}
@@ -30,6 +35,17 @@ const ConsultationScreen = () => {
         options={{
           tabBarColor: "#111",
           tabBarLabel: "Details",
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name="home" color={color} size={26} />
+          ),
+        }}
+      />
+      <Screen
+        name="Lab Details"
+        component={labDetails}
+        options={{
+          tabBarColor: "#111",
+          tabBarLabel: "Lab Details",
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="home" color={color} size={26} />
           ),

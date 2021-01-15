@@ -1,100 +1,113 @@
 import React from "react";
+import { connect } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import {
   Text,
   View,
   FlatList,
   StyleSheet,
   TextInput,
+  Image,
   ScrollView,
   TouchableOpacity,
   Dimensions,
+  Button,
 } from "react-native";
 
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Animatable from "react-native-animatable";
 
 import Icon from "react-native-vector-icons/MaterialIcons";
 import Feather from "react-native-vector-icons/Feather";
 
-const Settings = () => {
+const Settings = (props) => {
+  const {
+    firstname,
+    lastname,
+    role,
+    email,
+    contact,
+    emergencyContact,
+  } = props.auth.user;
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={{ color: "#fff", fontSize: 30, fontWeight: "bold" }}>
-          Edit Profile
-        </Text>
-      </View>
-
-      <ScrollView style={styles.footer}>
-        <View style={styles.action}>
-          <Text style={styles.headerText}>Basic Info</Text>
-          <View style={styles.divider}></View>
-
-          <View style={styles.form_group}>
-            <Feather name="user" size={20} />
-            <TextInput placeholder="Firstname" style={styles.input} />
-          </View>
-
-          <View style={styles.form_group}>
-            <Feather name="user" size={20} />
-            <TextInput placeholder="Lastname" style={styles.input} />
-          </View>
-
-          <View style={styles.form_group}>
-            <Feather name="user-plus" size={20} />
-            <TextInput placeholder="Age" style={styles.input} />
-          </View>
-
-          <View style={styles.form_group}>
-            <Feather name="calendar" size={20} />
-            <TextInput placeholder="Date of birth" style={styles.input} />
-          </View>
-
-          <Text style={[styles.headerText, { marginTop: 50 }]}>
-            Address Info
-          </Text>
-          <View style={styles.divider}></View>
-
-          <View style={styles.form_group}>
-            <Feather name="phone" size={20} />
-            <TextInput placeholder="Contact" style={styles.input} />
-          </View>
-
-          <View style={styles.form_group}>
-            <Feather name="phone-call" size={20} />
-            <TextInput placeholder="Emergency Contact" style={styles.input} />
-          </View>
-
-          <View style={styles.form_group}>
-            <Feather name="mail" size={20} />
-            <TextInput placeholder="Email" style={styles.input} />
-          </View>
-
-          <View style={styles.form_group}>
-            <Feather name="map" size={20} />
-            <TextInput placeholder="Area of residence" style={styles.input} />
-          </View>
-
-          <Text style={[styles.headerText, { marginTop: 50 }]}>
-            Marital Info
-          </Text>
-          <View style={styles.divider}></View>
-
-          <View style={styles.form_group}>
-            <Icon name="people-outline" size={26} />
-            <TextInput placeholder="Marital Status" style={styles.input} />
-          </View>
-
-          <View>
-            <LinearGradient colors={["#111", "#333"]} style={styles.submit_btn}>
-              <TouchableOpacity onPress={() => console.log("pressed")}>
-                <Text style={{ color: "#fff", textAlign: "center" }}>
-                  Register
-                </Text>
-              </TouchableOpacity>
-            </LinearGradient>
+      <ScrollView style={styles.wrapper}>
+        <View
+          style={{
+            flexDirection: "row",
+            marginBottom: 30,
+            paddingVertical: 20,
+          }}
+        >
+          <View style={styles.user_image}></View>
+          <View style={styles.user_details}>
+            <Text style={styles.ud_name}>
+              {firstname} {lastname}
+            </Text>
+            <Text style={styles.ud_email}>{email}</Text>
+            <View style={styles.divider}></View>
           </View>
         </View>
+
+        <TouchableOpacity
+          style={styles.cta}
+          onPress={() => {
+            props.navigation.navigate("About Us");
+          }}
+        >
+          <View style={styles.cta_icon}>
+            <MaterialCommunityIcons name="home" color="green" size={30} />
+          </View>
+          <View style={styles.cta_text}>
+            <Text style={styles.cta_text_header}>About HMS</Text>
+            <Text style={styles.cta_subtext}>
+              Lorem ipsum dolor sit amet consectetur..
+            </Text>
+          </View>
+        </TouchableOpacity>
+        <View style={styles.divider}></View>
+
+        <TouchableOpacity
+          style={styles.cta}
+          onPress={() => {
+            props.navigation.navigate("View Account");
+          }}
+        >
+          <View style={styles.cta_icon}>
+            <MaterialCommunityIcons name="home" color="green" size={30} />
+          </View>
+          <View style={styles.cta_text}>
+            <Text style={styles.cta_text_header}>Account</Text>
+            <Text style={styles.cta_subtext}>
+              View and edit worker details...
+            </Text>
+          </View>
+        </TouchableOpacity>
+        <View style={styles.divider}></View>
+
+        <TouchableOpacity
+          style={styles.cta}
+          onPress={() => {
+            AsyncStorage.setItem("token", "")
+              .then((token) => {
+                console.log("clicked");
+                props.navigation.navigate("Login", { msg: "Logged Out" });
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          }}
+        >
+          <View style={styles.cta_icon}>
+            <MaterialCommunityIcons name="home" color="green" size={30} />
+          </View>
+          <View style={styles.cta_text}>
+            <Text style={styles.cta_text_header}>Logout</Text>
+            <Text style={styles.cta_subtext}>Sign out from HMS...</Text>
+          </View>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -107,55 +120,58 @@ const screenHeight = height;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f18f01ff",
   },
-  header: {
-    height: screenHeight * 0.15,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  footer: {
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    paddingVertical: 50,
-    paddingHorizontal: 30,
-    height: screenHeight * 0.85,
-  },
-  form_group: {
-    flexDirection: "row",
-    marginBottom: 20,
-    alignItems: "center",
-  },
-  headerText: {
-    color: "#2e4057ff",
-    fontSize: 20,
-    fontWeight: 200,
-  },
+
   divider: {
-    borderBottomColor: "#2e4057ff",
+    borderBottomColor: "#dedede",
     borderBottomWidth: 3,
     marginBottom: 10,
   },
-  input: {
-    paddingHorizontal: 5,
-    paddingVertical: 10,
 
-    borderBottomWidth: 3,
-    borderBottomColor: "#999",
-    paddingBottom: 5,
-
-    width: "100%",
-    color: "#999",
-    fontSize: 20,
+  parent: {
+    flexDirection: "row",
   },
-  action: {
+  wrapper: {
     padding: 20,
   },
-  submit_btn: {
-    marginTop: 50,
-    paddingVertical: 10,
+  user_image: {
+    backgroundColor: "#333",
+    borderRadius: "50%",
+    height: 80,
+    width: 80,
+    marginRight: 10,
+  },
+  user_details: {
+    justifyContent: "center",
+  },
+  ud_name: {
+    fontSize: 20,
+    color: "blue",
+    fontWeight: 500,
+    marginBottom: 5,
+  },
+
+  cta: {
+    flexDirection: "row",
+    paddingVertical: 20,
+  },
+  cta_icon: {
+    justifyContent: "center",
+    marginRight: 20,
+  },
+  cta_text_header: {
+    fontSize: 20,
+    color: "#666",
+    fontWeight: "700",
+    marginBottom: 5,
+  },
+  cta_subtext: {
+    color: "#888",
+    marginBottom: 10,
   },
 });
 
-export default Settings;
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+});
+export default connect(mapStateToProps, {})(Settings);

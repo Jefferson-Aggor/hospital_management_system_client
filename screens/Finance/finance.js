@@ -1,63 +1,98 @@
 import React from "react";
+import { connect } from "react-redux";
+import { getPatients } from "../../src/actions/patientActions";
 import {
   Text,
   View,
   FlatList,
   StyleSheet,
-  Dimensions,
-  ScrollView,
   TextInput,
+  ScrollView,
   TouchableOpacity,
+  Dimensions,
+  Image,
 } from "react-native";
+
+import Picker from "@react-native-picker/picker";
 
 import { LinearGradient } from "expo-linear-gradient";
 import * as Animatable from "react-native-animatable";
 
-import FontAwesome from "react-native-vector-icons/FontAwesome";
+import imgSource from "../../assets/bg-2.jpg";
+
+import Icon from "react-native-vector-icons/MaterialIcons";
 import Feather from "react-native-vector-icons/Feather";
 
-const Finance = ({ navigation }) => {
-  return (
-    <View style={styles.container}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text
+class Finance extends React.Component {
+  componentDidMount() {
+    this.props.getPatients();
+  }
+  render() {
+    const { navigation, patients, isLoading, auth } = this.props;
+
+    let content;
+
+    if (patients.patients === null || isLoading) {
+      content = <Text>Loading</Text>;
+    } else {
+      content = patients.patients.data.map((patient) => {
+        return (
+          <TouchableOpacity
             style={{
-              color: "#fff",
-              fontSize: 30,
-              fontWeight: "100",
-              fontFamily: "lato",
+              backgroundColor: patient.paid ? "#D4EDDA" : "#F8D7DA",
+              color: patient.paid ? "#588C64" : "#D8ABAF",
+            }}
+            key={patient._id}
+            onPress={() => {
+              return navigation.navigate("Details", patient);
             }}
           >
-            Finance
-          </Text>
-        </View>
+            <View style={styles.card_body}>
+              <View style={styles.card_image}>
+                <Image source={imgSource} />
+              </View>
+              <View style={styles.card_text}>
+                <Text
+                  style={(styles.card_title, { textTransform: "capitalize" })}
+                >
+                  {patient.firstname} {patient.lastname}
+                </Text>
+                <Text style={styles.card_subText}>
+                  <Text>Member Since: {patient.joinedAt}</Text>
+                </Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        );
+      });
+    }
 
-        <Animatable.View animation="fadeInUpBig">
-          <View style={styles.footer}>
-            <ScrollView>
-              <TouchableOpacity
-                style={styles.card}
-                onPress={() => navigation.navigate("Details")}
-              >
-                <View style={styles.card_body}>
-                  <View style={styles.card_image}></View>
-                  <View style={styles.card_text}>
-                    <Text style={styles.card_title}>Name</Text>
-                    <Text style={styles.card_subText}>
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                      Laborum autem
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            </ScrollView>
+    return (
+      <View style={styles.container}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Text
+              style={{
+                color: "#fff",
+                fontSize: 30,
+                fontWeight: "100",
+                fontFamily: "lato",
+              }}
+            >
+              Finance
+            </Text>
           </View>
-        </Animatable.View>
+
+          <Animatable.View animation="fadeInUpBig">
+            <View style={styles.footer}>
+              <ScrollView>{content}</ScrollView>
+            </View>
+          </Animatable.View>
+        </View>
       </View>
-    </View>
-  );
-};
+    );
+  }
+}
 
 const { width, height } = Dimensions.get("screen");
 const screenWidth = width;
@@ -66,7 +101,7 @@ const screenHeight = height;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#2f2d2eff",
+    backgroundColor: "#444",
   },
   header: {
     height: screenHeight * 0.15,
@@ -81,27 +116,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     height: screenHeight * 0.85,
   },
-  dividerText: { color: "#2e4057ff", fontSize: 20, fontWeight: 200 },
-  headerText: {
-    color: "#fff",
-    fontSize: 30,
-    fontWeight: "100",
-    fontFamily: "lato",
-    marginBottom: 10,
-  },
-  subText: {
-    color: "#eee",
-    fontSize: 15,
-  },
-
   form_group: {
     flexDirection: "row",
     marginBottom: 20,
     alignItems: "center",
   },
-
+  headerText: {
+    color: "#2e4057ff",
+    fontSize: 20,
+    fontWeight: 200,
+  },
   divider: {
     borderBottomColor: "#2e4057ff",
+    borderBottomWidth: 3,
+    marginBottom: 10,
+  },
+  divider_white: {
+    borderBottomColor: "#fff",
     borderBottomWidth: 3,
     marginBottom: 10,
   },
@@ -110,7 +141,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
 
     borderBottomWidth: 3,
-    borderBottomColor: "#eee",
+    borderBottomColor: "#999",
     paddingBottom: 5,
 
     width: "100%",
@@ -160,4 +191,9 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Finance;
+const mapStatesToProps = (state) => ({
+  auth: state.auth,
+  patients: state.patients,
+  errors: state.errors,
+});
+export default connect(mapStatesToProps, { getPatients })(Finance);
