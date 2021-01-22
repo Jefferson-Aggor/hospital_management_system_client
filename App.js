@@ -29,13 +29,13 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator>
           {/* <Screen name="Welcome" component={OnboardingScreen}  /> */}
-          {/* <Stack.Screen
+          <Stack.Screen
             name="Get Started"
             component={SplashScreen}
             options={{
               headerShown: false,
             }}
-          /> */}
+          />
           <Stack.Screen
             name="Login"
             component={LoginScreen}
@@ -43,28 +43,10 @@ export default function App() {
               headerShown: false,
             }}
           />
-          <Stack.Screen
-            name="Reception"
-            component={Reception}
-            options={{
-              headerShown: false,
-            }}
-          />
+          <Stack.Screen name="Reception" component={Reception} />
 
-          {/* <Stack.Screen
-            name="Consultation"
-            component={ConsultationScreen}
-            options={{
-              headerShown: false,
-            }}
-          /> */}
-          <Stack.Screen
-            name="Lab"
-            component={LabScreen}
-            options={{
-              headerShown: false,
-            }}
-          />
+          <Stack.Screen name="Consultation" component={ConsultationScreen} />
+          <Stack.Screen name="Lab" component={LabScreen} />
           <Stack.Screen name="Finance" component={FinanceScreen} />
           <Stack.Screen name="About Us" component={AboutScreen} />
           <Stack.Screen name="View Account" component={AccountScreen} />

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { searchPatients } from "../../src/actions/patientActions";
-import Spinner from "../../src/components/Spinner";
+import Loading from "../../components/Loading";
 import {
   Text,
   View,
@@ -13,10 +13,14 @@ import {
   TouchableOpacity,
 } from "react-native";
 
+import Moment from "react-moment";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+
 class ReceptionScreen extends React.Component {
   state = {
     firstname: null,
     lastname: null,
+    done: false,
   };
   // componentDidMount() {
   //   this.props.getPatients(this.state);
@@ -35,35 +39,86 @@ class ReceptionScreen extends React.Component {
     const { patient, isLoading } = this.props.patients;
 
     let content;
-    if (isLoading) {
-      content = <Text>Loading..</Text>;
-    }
-
-    if (patient === null) {
+    if (isLoading && !Object.keys(this.props.errors).includes("msg")) {
+      content = <Loading />;
+    } else if (
+      patient === null &&
+      !Object.keys(this.props.errors).includes("msg")
+    ) {
       content = (
-        <View>
-          <Text>Search Patients</Text>
+        <View
+          style={{
+            borderLeftColor: "green",
+            borderLeftWidth: 5,
+            marginRight: 5,
+            backgroundColor: "#f4f4f4",
+            paddingVertical: 20,
+            paddingHorizontal: 25,
+          }}
+        >
+          <Text style={{ fontSize: 18, color: "green" }}>Search Patients</Text>
+        </View>
+      );
+    } else if (Object.keys(this.props.errors).includes("msg")) {
+      content = (
+        <View
+          style={{
+            borderLeftColor: "red",
+            borderLeftWidth: 5,
+            marginRight: 5,
+            backgroundColor: "#f4f4f4",
+            paddingVertical: 20,
+            paddingHorizontal: 25,
+          }}
+        >
+          <Text style={{ fontSize: 18, color: "red" }}>
+            {this.props.errors.msg}
+          </Text>
         </View>
       );
     } else {
       if (patient.data.length == 0) {
         content = (
-          <View>
-            <Text>User not found</Text>
-            <Button
-              onPress={() => this.props.navigation.navigate("Register Patient")}
-              title="Register Patient"
-            />
-          </View>
+          <TouchableOpacity
+            onPress={() => this.props.navigation.navigate("Register Patient")}
+          >
+            <View
+              style={{
+                borderLeftColor: "red",
+                borderLeftWidth: 5,
+                marginRight: 5,
+                backgroundColor: "#f4f4f4",
+                paddingVertical: 20,
+                paddingHorizontal: 25,
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Text style={{ fontSize: 18, color: "red" }}>
+                  User not found
+                </Text>
+                <View
+                  style={{ alignItems: "center", justifyContent: "center" }}
+                >
+                  <MaterialIcons
+                    name="navigate-next"
+                    color="red"
+                    size={40}
+                    style={styles.icon}
+                  />
+                </View>
+              </View>
+            </View>
+          </TouchableOpacity>
         );
       } else {
         content = patient.data.map((patient) => {
           return (
             <TouchableOpacity
-              style={{
-                backgroundColor: patient.paid ? "#D4EDDA" : "#F8D7DA",
-                color: patient.paid ? "#588C64" : "#D8ABAF",
-              }}
               key={patient._id}
               onPress={() => {
                 if (patient.paid) {
@@ -71,17 +126,43 @@ class ReceptionScreen extends React.Component {
                 }
               }}
             >
-              <View style={styles.card_body}>
-                <View style={styles.card_image}></View>
+              <View
+                style={[
+                  styles.card_body,
+                  styles.card,
+                  { borderLeftColor: patient.paid ? "green" : "red" },
+                ]}
+              >
                 <View style={styles.card_text}>
-                  <Text
-                    style={(styles.card_title, { textTransform: "capitalize" })}
+                  <View>
+                    <Text
+                      style={[
+                        styles.card_title,
+                        { color: patient.paid ? "green" : "red" },
+                      ]}
+                    >
+                      {patient.firstname} {patient.lastname}
+                    </Text>
+                    <Text style={styles.card_subText}>
+                      <Text>
+                        Member Since:{" "}
+                        <Moment format="DD / MM / YYYY">
+                          {patient.joinedAt}
+                        </Moment>
+                      </Text>
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{ alignItems: "center", justifyContent: "center" }}
                   >
-                    {patient.firstname} {patient.lastname}
-                  </Text>
-                  <Text style={styles.card_subText}>
-                    <Text>Member Since: {patient.joinedAt}</Text>
-                  </Text>
+                    <MaterialIcons
+                      name="navigate-next"
+                      color={patient.paid ? "green" : "red"}
+                      size={40}
+                      style={styles.icon}
+                    />
+                  </View>
                 </View>
               </View>
             </TouchableOpacity>
@@ -97,17 +178,18 @@ class ReceptionScreen extends React.Component {
           <TextInput
             placeholder="Search Patient"
             placeholderTextColor="#777"
-            style={styles.input}
+            style={[styles.input, { textTransform: "capitalize" }]}
             onChangeText={this._onChangeText().bind(this)}
           />
           <Button
             title="Search"
             onPress={() => {
+              this.setState({ done: false });
+
               this.props.searchPatients(this.state);
             }}
           />
         </View>
-        {/* Search Output */}
 
         <ScrollView>
           <View style={styles.search_output}>{content}</View>
@@ -122,18 +204,10 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingVertical: 20,
-    backgroundColor: "#f4f4f4",
-  },
-  header: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: "#fff",
   },
   footer: {
-    flex: 3,
     backgroundColor: "#fff",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
     paddingVertical: 50,
     paddingHorizontal: 30,
   },
@@ -141,66 +215,56 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
-  bgImage: {
-    flex: 1,
-  },
-
-  form_group: {
-    flexDirection: "row",
-    marginBottom: 20,
-    alignItems: "center",
-  },
-
-  input: {
-    paddingHorizontal: 5,
-    paddingVertical: 10,
-
-    borderBottomWidth: 3,
-    borderBottomColor: "#777",
-    paddingBottom: 5,
-
-    width: "100%",
-    marginLeft: 10,
-    color: "#ccc",
-    fontSize: 20,
-  },
-
   card: {
     backgroundColor: "#fff",
     width: "100%",
+    marginBottom: 20,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 1,
     },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
 
-    elevation: 3,
+    elevation: 5,
 
     marginBottom: 20,
-  },
-  search_output: {
-    marginVertical: 50,
+
+    borderLeftWidth: 5,
   },
   card_body: {
     flexDirection: "row",
     width: "100%",
   },
-  card_image: {
-    backgroundColor: "#fff",
-    width: "20%",
-  },
+
   card_text: {
     paddingVertical: 10,
-    paddingHorizontal: 10,
-    width: "80%",
+    paddingHorizontal: 15,
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   card_title: {
-    // color: "#444",
-    fontSize: 20,
-    fontWeight: 500,
+    fontSize: 18,
+    fontWeight: 400,
     marginBottom: 10,
+    textTransform: "capitalize",
+  },
+  icon: {
+    alignContent: "center",
+  },
+  form_group: {
+    paddingVertical: 30,
+  },
+  input: {
+    borderBottomColor: "#777",
+    borderBottomWidth: 3,
+    marginBottom: 20,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    fontSize: 18,
+    letterSpacing: 3,
   },
 });
 

@@ -65,46 +65,47 @@ class AssignDoctor extends React.Component {
 
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={{ color: "#fff", fontSize: 30, fontWeight: "bold" }}>
-            {content}
-          </Text>
-        </View>
-
-        <ScrollView style={styles.footer}>
-          <View style={styles.action}>
-            <Text style={[styles.headerText, { marginTop: 50 }]}>
-              Assign Doctor / {firstname}
-            </Text>
-            <View style={styles.divider}></View>
-
-            <View style={styles.form_group}>
-              <Icon name="people-outline" size={26} />
-              <TextInput
-                placeholder="Select Doctor"
-                style={styles.input}
-                onChangeText={this._onChangeText().bind(this)}
-              />
-            </View>
-
-            <View>
-              <LinearGradient
-                colors={["#111", "#333"]}
-                style={styles.submit_btn}
+        <View style={styles.footer}>
+          <ScrollView>
+            <View style={styles.action}>
+              <Text
+                style={[
+                  styles.headerText,
+                  { marginTop: 50, textTransform: "capitalize" },
+                ]}
               >
-                <TouchableOpacity
-                  onPress={() => {
-                    this.props.assignDoctor(this.state);
-                  }}
+                Assign Doctor to {firstname}
+              </Text>
+              <View style={styles.divider}></View>
+
+              <View style={styles.form_group}>
+                <Icon name="people-outline" size={26} />
+                <TextInput
+                  placeholder="Select Doctor"
+                  style={styles.input}
+                  onChangeText={this._onChangeText().bind(this)}
+                />
+              </View>
+
+              <View>
+                <LinearGradient
+                  colors={["#111", "#333"]}
+                  style={styles.submit_btn}
                 >
-                  <Text style={{ color: "#fff", textAlign: "center" }}>
-                    Assign Doctor
-                  </Text>
-                </TouchableOpacity>
-              </LinearGradient>
+                  <TouchableOpacity
+                    onPress={() => {
+                      this.props.assignDoctor(this.state);
+                    }}
+                  >
+                    <Text style={{ color: "#fff", textAlign: "center" }}>
+                      Assign Doctor
+                    </Text>
+                  </TouchableOpacity>
+                </LinearGradient>
+              </View>
             </View>
-          </View>
-        </ScrollView>
+          </ScrollView>
+        </View>
       </View>
     );
   }
@@ -126,11 +127,12 @@ const styles = StyleSheet.create({
   },
   footer: {
     backgroundColor: "#fff",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+
     paddingVertical: 50,
     paddingHorizontal: 30,
-    height: screenHeight * 0.85,
+    height: screenHeight,
+    justifyContent: "center",
+    alignItems: "center",
   },
   form_group: {
     flexDirection: "row",

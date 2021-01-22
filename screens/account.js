@@ -9,11 +9,9 @@ import {
 } from "react-native";
 import { connect } from "react-redux";
 
-import { LinearGradient } from "expo-linear-gradient";
-import * as Animatable from "react-native-animatable";
-
-import Icon from "react-native-vector-icons/MaterialIcons";
 import Feather from "react-native-vector-icons/Feather";
+
+import { getFirstLetter } from "../src/utils";
 
 class Account extends Component {
   state = {
@@ -33,32 +31,59 @@ class Account extends Component {
     return (text) => this.setState({ ...this.state, [name]: text });
   }
   render() {
+    const {
+      firstname,
+      lastname,
+      role,
+      email,
+      contact,
+      emergency_contact,
+      area_of_residence,
+    } = this.props.route.params;
     return (
       <View style={styles.wrapper}>
         <ScrollView>
           <View style={styles.header}>
-            <View style={styles.image}></View>
+            <View style={styles.image}>
+              <Text
+                style={{
+                  color: "#fff",
+                  fontSize: 25,
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                }}
+              >
+                {getFirstLetter(firstname)}
+              </Text>
+            </View>
             <View>
-              <Text style={styles.name}>Jefferson Aggor</Text>
-              <Text style={styles.role}>Doctor</Text>
+              <Text style={styles.name}>
+                {firstname} {lastname}
+              </Text>
+              <Text style={styles.role}>{role}</Text>
             </View>
           </View>
-          <Text style={[styles.headerText]}>Address Info</Text>
+          <Text style={[styles.headerText]}>Address Info </Text>
+
           <View style={styles.divider}></View>
+
           <View style={styles.form_group}>
             <Feather name="user" size={20} />
             <TextInput
               placeholder="Email"
               style={styles.input}
               onChangeText={this._onChangeText("email").bind(this)}
+              value={email}
             />
           </View>
+
           <View style={styles.form_group}>
             <Feather name="user" size={20} />
             <TextInput
               placeholder="Contact"
               style={styles.input}
               onChangeText={this._onChangeText("contact").bind(this)}
+              value={contact}
             />
           </View>
 
@@ -68,6 +93,7 @@ class Account extends Component {
               placeholder="Emergency Contact"
               style={styles.input}
               onChangeText={this._onChangeText("emergency_contact").bind(this)}
+              value={emergency_contact}
             />
           </View>
 
@@ -75,12 +101,14 @@ class Account extends Component {
             Location Info
           </Text>
           <View style={styles.divider}></View>
+
           <View style={styles.form_group}>
             <Feather name="user" size={20} />
             <TextInput
               placeholder="Area of residence"
               style={styles.input}
               onChangeText={this._onChangeText("area_of_residence").bind(this)}
+              value={area_of_residence}
             />
           </View>
 
@@ -97,18 +125,11 @@ class Account extends Component {
             />
           </View>
 
-          <View>
-            <LinearGradient colors={["#333", "#222"]} style={styles.submit_btn}>
-              <TouchableOpacity
-                onPress={() => {
-                  console.log("hello");
-                }}
-              >
-                <Text style={{ color: "#fff", textAlign: "center" }}>
-                  Update Details
-                </Text>
-              </TouchableOpacity>
-            </LinearGradient>
+          <View style={{ paddingVertical: 20 }}>
+            <Text style={{ color: "red", fontSize: 18, textAlign: "center" }}>
+              Change details?
+            </Text>
+            <Text style={{ textAlign: "center" }}>Contact Administrator.</Text>
           </View>
         </ScrollView>
       </View>
@@ -138,10 +159,15 @@ const styles = StyleSheet.create({
     width: 70,
     borderRadius: "50%",
     marginBottom: 20,
+    justifyContent: "center",
+    alignItems: "center",
   },
   name: {
-    fontSize: 18,
-    color: "#666",
+    fontSize: 22,
+    color: "blue",
+    textTransform: "capitalize",
+    letterSpacing: 5,
+    fontWeight: "bold",
   },
   role: {
     fontSize: 16,

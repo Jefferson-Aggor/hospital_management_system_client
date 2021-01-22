@@ -12,6 +12,18 @@ const About = (props) => {
         deserunt a excepturi eum vero quas fuga earum nostrum harum, quis odio
         consectetur nam delectus itaque officiis quaerat dolor fugit!
       </Text>
+
+      <View style={[styles.card_body, styles.card]}>
+        <View style={styles.card_image}></View>
+        <View style={styles.card_text}>
+          <Text style={(styles.card_title, { textTransform: "capitalize" })}>
+            Jefferson Aggor
+          </Text>
+          <Text style={styles.card_subText}>
+            <Text>Member Since: 20 / 01 / 1999</Text>
+          </Text>
+        </View>
+      </View>
     </View>
   );
 };

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { connect } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -16,13 +16,11 @@ import {
 } from "react-native";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { LinearGradient } from "expo-linear-gradient";
-import * as Animatable from "react-native-animatable";
-
-import Icon from "react-native-vector-icons/MaterialIcons";
-import Feather from "react-native-vector-icons/Feather";
+import IonIcons from "react-native-vector-icons/IonIcons";
+import { getFirstLetter } from "../src/utils";
 
 const Settings = (props) => {
+  const [msg, setMsg] = useState({ msg: "Logged Out" });
   const {
     firstname,
     lastname,
@@ -31,6 +29,7 @@ const Settings = (props) => {
     contact,
     emergencyContact,
   } = props.auth.user;
+
   return (
     <View style={styles.container}>
       <ScrollView style={styles.wrapper}>
@@ -41,7 +40,18 @@ const Settings = (props) => {
             paddingVertical: 20,
           }}
         >
-          <View style={styles.user_image}></View>
+          <View style={styles.user_image}>
+            <Text
+              style={{
+                color: "#fff",
+                fontSize: 25,
+                fontWeight: "bold",
+                textTransform: "uppercase",
+              }}
+            >
+              {getFirstLetter(firstname)}
+            </Text>
+          </View>
           <View style={styles.user_details}>
             <Text style={styles.ud_name}>
               {firstname} {lastname}
@@ -58,7 +68,7 @@ const Settings = (props) => {
           }}
         >
           <View style={styles.cta_icon}>
-            <MaterialCommunityIcons name="home" color="green" size={30} />
+            <IonIcons name="book" color="#999" size={30} />
           </View>
           <View style={styles.cta_text}>
             <Text style={styles.cta_text_header}>About HMS</Text>
@@ -72,11 +82,11 @@ const Settings = (props) => {
         <TouchableOpacity
           style={styles.cta}
           onPress={() => {
-            props.navigation.navigate("View Account");
+            props.navigation.navigate("View Account", props.auth.user);
           }}
         >
           <View style={styles.cta_icon}>
-            <MaterialCommunityIcons name="home" color="green" size={30} />
+            <IonIcons name="settings" color="#999" size={30} />
           </View>
           <View style={styles.cta_text}>
             <Text style={styles.cta_text_header}>Account</Text>
@@ -92,8 +102,7 @@ const Settings = (props) => {
           onPress={() => {
             AsyncStorage.setItem("token", "")
               .then((token) => {
-                console.log("clicked");
-                props.navigation.navigate("Login", { msg: "Logged Out" });
+                props.navigation.push("Login", msg);
               })
               .catch((err) => {
                 console.log(err);
@@ -101,7 +110,7 @@ const Settings = (props) => {
           }}
         >
           <View style={styles.cta_icon}>
-            <MaterialCommunityIcons name="home" color="green" size={30} />
+            <IonIcons name="log-out" color="#999" size={30} />
           </View>
           <View style={styles.cta_text}>
             <Text style={styles.cta_text_header}>Logout</Text>
@@ -140,6 +149,8 @@ const styles = StyleSheet.create({
     height: 80,
     width: 80,
     marginRight: 10,
+    justifyContent: "center",
+    alignItems: "center",
   },
   user_details: {
     justifyContent: "center",
@@ -149,6 +160,7 @@ const styles = StyleSheet.create({
     color: "blue",
     fontWeight: 500,
     marginBottom: 5,
+    textTransform: "capitalize",
   },
 
   cta: {
@@ -161,7 +173,7 @@ const styles = StyleSheet.create({
   },
   cta_text_header: {
     fontSize: 20,
-    color: "#666",
+    color: "blue",
     fontWeight: "700",
     marginBottom: 5,
   },

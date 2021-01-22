@@ -32,6 +32,7 @@ class RegisterPatient extends React.Component {
     contact: null,
     emergencyContact: null,
     marital_status: "single",
+    isLoading: false,
   };
 
   _onChangeText(name) {
@@ -40,45 +41,34 @@ class RegisterPatient extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <Text
-              style={{
-                color: "#fff",
-                fontSize: 30,
-                fontWeight: "100",
-                fontFamily: "lato",
-              }}
-            >
-              Register Patient.
+        <Animatable.View animation="fadeInUpBig" style={styles.footer}>
+          <ScrollView>
+            <Text style={{ fontSize: 20, color: "#777", letterSpacing: 3 }}>
+              Register Patient
             </Text>
-          </View>
+            <View style={styles.action}>
+              <Text style={styles.headerText}>Basic Info</Text>
+              <View style={styles.divider}></View>
 
-          <Animatable.View animation="fadeInUpBig">
-            <ScrollView style={styles.footer}>
-              <View style={styles.action}>
-                <Text style={styles.headerText}>Basic Info</Text>
-                <View style={styles.divider}></View>
+              <View style={styles.form_group}>
+                <Feather name="user" size={20} />
+                <TextInput
+                  placeholder="Firstname"
+                  style={styles.input}
+                  onChangeText={this._onChangeText("firstname").bind(this)}
+                />
+              </View>
 
-                <View style={styles.form_group}>
-                  <Feather name="user" size={20} />
-                  <TextInput
-                    placeholder="Firstname"
-                    style={styles.input}
-                    onChangeText={this._onChangeText("firstname").bind(this)}
-                  />
-                </View>
+              <View style={styles.form_group}>
+                <Feather name="user" size={20} />
+                <TextInput
+                  placeholder="Lastname"
+                  style={styles.input}
+                  onChangeText={this._onChangeText("lastname").bind(this)}
+                />
+              </View>
 
-                <View style={styles.form_group}>
-                  <Feather name="user" size={20} />
-                  <TextInput
-                    placeholder="Lastname"
-                    style={styles.input}
-                    onChangeText={this._onChangeText("lastname").bind(this)}
-                  />
-                </View>
-
-                {/* <View style={styles.form_group}>
+              {/* <View style={styles.form_group}>
                   <Feather name="user-plus" size={20} />
                   <TextInput
                     placeholder="Age"
@@ -87,102 +77,99 @@ class RegisterPatient extends React.Component {
                   />
                 </View> */}
 
-                <View style={styles.form_group}>
-                  <Feather name="calendar" size={20} />
-                  <TextInput
-                    name
-                    placeholder="Date of birth"
-                    style={styles.input}
-                    onChangeText={this._onChangeText("date_of_birth").bind(
-                      this
-                    )}
-                  />
-                </View>
-
-                <Text style={[styles.headerText, { marginTop: 50 }]}>
-                  Address Info
-                </Text>
-                <View style={styles.divider}></View>
-
-                <View style={styles.form_group}>
-                  <Feather name="phone" size={20} />
-                  <TextInput
-                    name="contact"
-                    placeholder="Contact"
-                    style={styles.input}
-                    onChangeText={this._onChangeText("contact").bind(this)}
-                  />
-                </View>
-
-                <View style={styles.form_group}>
-                  <Feather name="phone-call" size={20} />
-                  <TextInput
-                    name="emergency_contact"
-                    placeholder="Emergency Contact"
-                    style={styles.input}
-                    onChangeText={this._onChangeText("emergencyContact").bind(
-                      this
-                    )}
-                  />
-                </View>
-
-                <View style={styles.form_group}>
-                  <Feather name="mail" size={20} />
-                  <TextInput
-                    placeholder="Occupation"
-                    style={styles.input}
-                    name="email"
-                    onChangeText={this._onChangeText("occupation").bind(this)}
-                  />
-                </View>
-
-                <View style={styles.form_group}>
-                  <Feather name="map" size={20} />
-                  <TextInput
-                    placeholder="Area of residence"
-                    style={styles.input}
-                    onChangeText={this._onChangeText("area_of_residence").bind(
-                      this
-                    )}
-                  />
-                </View>
-
-                <Text style={[styles.headerText, { marginTop: 50 }]}>
-                  Marital Info
-                </Text>
-                <View style={styles.divider}></View>
-
-                <View style={styles.form_group}>
-                  <Icon name="people-outline" size={26} />
-                  <TextInput
-                    placeholder="Marital Status"
-                    style={styles.input}
-                    onChangeText={this._onChangeText("marital_status").bind(
-                      this
-                    )}
-                  />
-                </View>
-
-                <View>
-                  <LinearGradient
-                    colors={["#333", "#222"]}
-                    style={styles.submit_btn}
-                  >
-                    <TouchableOpacity
-                      onPress={() => {
-                        this.props.registerPatient(this.state);
-                      }}
-                    >
-                      <Text style={{ color: "#fff", textAlign: "center" }}>
-                        Register
-                      </Text>
-                    </TouchableOpacity>
-                  </LinearGradient>
-                </View>
+              <View style={styles.form_group}>
+                <Feather name="calendar" size={20} />
+                <TextInput
+                  name
+                  placeholder="Date of birth"
+                  style={styles.input}
+                  onChangeText={this._onChangeText("date_of_birth").bind(this)}
+                />
               </View>
-            </ScrollView>
-          </Animatable.View>
-        </View>
+
+              <Text style={[styles.headerText, { marginTop: 50 }]}>
+                Address Info
+              </Text>
+              <View style={styles.divider}></View>
+
+              <View style={styles.form_group}>
+                <Feather name="phone" size={20} />
+                <TextInput
+                  name="contact"
+                  placeholder="Contact"
+                  style={styles.input}
+                  onChangeText={this._onChangeText("contact").bind(this)}
+                />
+              </View>
+
+              <View style={styles.form_group}>
+                <Feather name="phone-call" size={20} />
+                <TextInput
+                  name="emergency_contact"
+                  placeholder="Emergency Contact"
+                  style={styles.input}
+                  onChangeText={this._onChangeText("emergencyContact").bind(
+                    this
+                  )}
+                />
+              </View>
+
+              <View style={styles.form_group}>
+                <Feather name="mail" size={20} />
+                <TextInput
+                  placeholder="Occupation"
+                  style={styles.input}
+                  name="email"
+                  onChangeText={this._onChangeText("occupation").bind(this)}
+                />
+              </View>
+
+              <View style={styles.form_group}>
+                <Feather name="map" size={20} />
+                <TextInput
+                  placeholder="Area of residence"
+                  style={styles.input}
+                  onChangeText={this._onChangeText("area_of_residence").bind(
+                    this
+                  )}
+                />
+              </View>
+
+              <Text style={[styles.headerText, { marginTop: 50 }]}>
+                Marital Info
+              </Text>
+              <View style={styles.divider}></View>
+
+              <View style={styles.form_group}>
+                <Icon name="people-outline" size={26} />
+                <TextInput
+                  placeholder="Marital Status"
+                  style={styles.input}
+                  onChangeText={this._onChangeText("marital_status").bind(this)}
+                />
+              </View>
+
+              <View>
+                <LinearGradient
+                  colors={["#333", "#222"]}
+                  style={styles.submit_btn}
+                >
+                  <TouchableOpacity
+                    onPress={() => {
+                      this.setState({ isLoading: true });
+
+                      this.props.registerPatient(this.state);
+                    }}
+                  >
+                    <Text style={{ color: "#fff", textAlign: "center" }}>
+                      Register
+                    </Text>
+                  </TouchableOpacity>
+                </LinearGradient>
+              </View>
+            </View>
+          </ScrollView>
+        </Animatable.View>
       </View>
     );
   }
@@ -201,20 +188,14 @@ const screenHeight = height;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#444",
+    height: screenHeight,
   },
-  header: {
-    height: screenHeight * 0.15,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+
   footer: {
     backgroundColor: "#fff",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
     paddingVertical: 50,
     paddingHorizontal: 30,
-    height: screenHeight * 0.85,
+    height: "inherit",
   },
   form_group: {
     flexDirection: "row",
@@ -249,11 +230,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   action: {
-    padding: 20,
+    paddingVertical: 50,
   },
   submit_btn: {
-    marginTop: 50,
-    paddingVertical: 10,
+    padding: 20,
+    marginVertical: 50,
   },
 });
 

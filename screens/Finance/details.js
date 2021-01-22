@@ -66,9 +66,6 @@ const Details = (props) => {
 
     content = (
       <View>
-        <View style={styles.header}>
-          <Text style={styles.headerText}>Finance Office</Text>
-        </View>
         <Animatable.View animation="fadeInUpBig" style={styles.footer}>
           <ScrollView style={{ paddingBottom: 40 }}>
             <View style={styles.form_group}>
@@ -197,20 +194,14 @@ const screenHeight = height;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#2f2d2eff",
   },
-  header: {
-    height: screenHeight * 0.15,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+
   footer: {
     backgroundColor: "#fff",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+
     paddingVertical: 50,
     paddingHorizontal: 30,
-    height: screenHeight * 0.85,
+    height: screenHeight,
   },
   dividerText: { color: "#2e4057ff", fontSize: 20, fontWeight: 200 },
   headerText: {

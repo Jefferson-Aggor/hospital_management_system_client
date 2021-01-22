@@ -6,6 +6,7 @@ import Feather from "react-native-vector-icons/Feather";
 import ReceptionScreen from "./reception";
 import RegisterPatient from "./registerPatient";
 import AssignDoctor from "./assignDoctor";
+import Settings from "../settings";
 
 const ReceptionTab = createMaterialBottomTabNavigator();
 
@@ -40,8 +41,19 @@ const Reception = () => {
         name="Assign Doctor"
         component={AssignDoctor}
         options={{
-          tabBarColor: "#f18f01ff",
+          tabBarColor: "#444",
           tabBarLabel: "Assign Doctor",
+          tabBarIcon: ({ color }) => (
+            <Feather name="home" color={color} size={26} />
+          ),
+        }}
+      />
+      <Screen
+        name="Settings"
+        component={Settings}
+        options={{
+          tabBarColor: "#444",
+          tabBarLabel: "Settings",
           tabBarIcon: ({ color }) => (
             <Feather name="settings" color={color} size={26} />
           ),

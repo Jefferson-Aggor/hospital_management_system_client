@@ -11,10 +11,8 @@ const Loading = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 100,
   },
   loading_text: {
     fontSize: 35,

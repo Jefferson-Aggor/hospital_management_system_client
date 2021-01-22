@@ -21,9 +21,7 @@ import Login from "../assets/login.jpg";
 
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Feather from "react-native-vector-icons/Feather";
-
-import Alert from "../components/Alert";
-import Loading from "../components/Loading";
+import IonIcons from "react-native-vector-icons/IonIcons";
 
 class LoginScreen extends Component {
   constructor() {
@@ -31,6 +29,8 @@ class LoginScreen extends Component {
     this.state = {
       email: null,
       password: null,
+      isLoading: false,
+      hide: false,
     };
     this._onChangeText = this._onChangeText.bind(this);
   }
@@ -58,7 +58,6 @@ class LoginScreen extends Component {
           return this.props.navigation.navigate("Login");
       }
     }
-    console.log(token);
   });
 
   componentWillReceiveProps(nextProps) {
@@ -77,25 +76,109 @@ class LoginScreen extends Component {
         default:
           return navigation.navigate("Login");
       }
-    } else {
-      return navigation.navigate("Get Started");
     }
+    // } else {
+    //   return navigation.navigate("Login");
+    // }
+  }
+
+  onSetState(name) {
+    return () => this.setState({ [name]: true, isLoading: false });
   }
 
   render() {
-    console.log(this.props);
+    let alert;
+
+    if (this.props.route.params !== undefined) {
+      alert = (
+        <Animatable.View
+          animation="fadeInDown"
+          duration={500}
+          style={[styles.card_body, styles.card, { borderLeftColor: "green" }]}
+        >
+          <View style={styles.card_text}>
+            <View>
+              <Text
+                style={[
+                  styles.card_title,
+                  { color: "green", justifyContent: "center" },
+                ]}
+              >
+                {this.props.route.params.msg}
+              </Text>
+            </View>
+
+            <View style={{ alignItems: "center", justifyContent: "center" }}>
+              <IonIcons
+                name="close"
+                color={"green"}
+                size={40}
+                style={styles.alert_icon}
+                onPress={this.onSetState("hide")}
+              />
+            </View>
+          </View>
+        </Animatable.View>
+      );
+    }
+
+    if (Object.keys(this.props.errors).includes("msg") && !this.state.hide) {
+      alert = (
+        <Animatable.View
+          animation="fadeInDown"
+          style={[styles.card_body, styles.card, { borderLeftColor: "red" }]}
+        >
+          <View style={styles.card_text}>
+            <View>
+              <Text
+                style={[
+                  styles.card_title,
+                  {
+                    color: "red",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  },
+                ]}
+              >
+                {this.props.errors.msg}
+              </Text>
+            </View>
+
+            <View style={{ alignItems: "center", justifyContent: "center" }}>
+              <IonIcons
+                name="close"
+                color={"red"}
+                size={40}
+                style={styles.alert_icon}
+                onPress={() => {
+                  this.setState({ hide: true, isLoading: false });
+                }}
+              />
+            </View>
+          </View>
+        </Animatable.View>
+      );
+    }
+
+    if (this.state.hide) {
+      alert = <Text>""</Text>;
+    }
+
     return (
       <ImageBackground source={BgImage} style={styles.bgImage}>
         <View style={styles.container}>
-          {this.props.route.params !== undefined &&
-          Object.keys.includes("msg") ? (
-            <View>{this.props.route.params.msg}</View>
-          ) : null}
+          {alert}
           <View style={styles.intro}>
-            <View style={styles.intro_logo}></View>
-            <Text style={styles.intro_text}>Lorem, ipsum dolor.</Text>
+            <View style={styles.intro_logo}>
+              <Text style={styles.intro_logo_text}>HMS</Text>
+            </View>
+            <Text style={styles.intro_text}>We make your work simpler.</Text>
           </View>
-          <Animatable.View animation="fadeInUpBig" style={styles.action}>
+
+          <Animatable.View
+            animation="fadeInUpBig"
+            style={[styles.action, { justifyContent: "center" }]}
+          >
             <View style={styles.form_group}>
               <Feather name="mail" size={20} style={styles.icon} />
               <TextInput
@@ -122,21 +205,47 @@ class LoginScreen extends Component {
                 style={styles.button}
                 onPress={async () => {
                   try {
+                    this.setState({
+                      ...this.state,
+                      isLoading: true,
+                      hide: false,
+                    });
                     await this.props.loginWorker(this.state);
-                  } catch (err) {
-                    console.log(err);
-                  }
+                  } catch (err) {}
                 }}
               >
-                <LinearGradient colors={["#fff", "#ccc"]} style={styles.signIn}>
-                  <Text color="#666">Login</Text>
-                  <MaterialIcons name="navigate-next" color="#666" size={20} />
+                <LinearGradient colors={["#fff", "#ccc"]}>
+                  {this.state.isLoading &&
+                  !Object.keys(this.props.errors).includes("msg") ? (
+                    <Animatable.View animation="flash" style={styles.signIn}>
+                      <Text
+                        style={{
+                          fontSize: 20,
+                          fontWeight: "bold",
+                          letterSpacing: 5,
+                        }}
+                      >
+                        Loading...
+                      </Text>
+                    </Animatable.View>
+                  ) : (
+                    <View style={styles.signIn}>
+                      <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+                        Login
+                      </Text>
+                      <MaterialIcons
+                        name="navigate-next"
+                        color="#666"
+                        size={20}
+                      />
+                    </View>
+                  )}
                 </LinearGradient>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={{ textAlign: "center" }}
-                onPress={() => alert("hello")}
+                onPress={() => console.log("hello")}
               >
                 <Text style={styles.icon}>Forgot Password?</Text>
               </TouchableOpacity>
@@ -150,6 +259,7 @@ class LoginScreen extends Component {
 
 const mapStateToProps = (state) => ({
   auth: state.auth,
+  errors: state.errors,
 });
 
 export default connect(mapStateToProps, { loginWorker })(LoginScreen);
@@ -189,14 +299,13 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   button: {
-    alignItems: "flex-end",
-
     paddingVertical: 20,
     paddingHorizontal: 10,
+    textAlign: "center",
   },
   signIn: {
-    width: 300,
-    height: 40,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
     justifyContent: "center",
     alignItems: "center",
     // borderRadius: 50,
@@ -229,7 +338,8 @@ const styles = StyleSheet.create({
     width: "100%",
     marginLeft: 10,
     color: "#ccc",
-    fontSize: 20,
+    fontSize: 18,
+    letterSpacing: 3,
   },
   icon: {
     color: "#fff",
@@ -241,13 +351,65 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   intro_logo: {
-    height: 100,
-    width: 100,
+    height: 120,
+    width: 120,
     borderRadius: "50%",
     backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  intro_logo_text: {
+    color: "#048ba8ff",
+    fontSize: 30,
+    fontWeight: 300,
+    letterSpacing: 3,
+    fontStyle: "italic",
   },
   intro_text: {
-    fontSize: 20,
+    fontSize: 17,
     color: "#ececec",
+    letterSpacing: 5,
+    textAlign: "center",
+    marginTop: 10,
+  },
+  card: {
+    backgroundColor: "#fff",
+    width: "100%",
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.6,
+    shadowRadius: 5,
+
+    elevation: 10,
+
+    marginBottom: 20,
+
+    borderLeftWidth: 5,
+  },
+  card_body: {
+    flexDirection: "row",
+    width: "100%",
+  },
+
+  card_text: {
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  card_title: {
+    fontSize: 18,
+    fontWeight: 400,
+    marginBottom: 10,
+    textTransform: "capitalize",
+  },
+  alert_icon: {
+    alignContent: "center",
   },
 });

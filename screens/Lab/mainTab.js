@@ -1,10 +1,10 @@
 import React from "react";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import Feather from "react-native-vector-icons/Feather";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 import Lab from "./lab";
 import Details from "./details";
+import Settings from "../settings";
 
 const LabTab = createMaterialBottomTabNavigator();
 
@@ -17,10 +17,10 @@ const LabScreen = () => {
         name="Lab"
         component={Lab}
         options={{
-          tabBarColor: "#99c24dff",
+          tabBarColor: "#111",
           tabBarLabel: "Lab",
           tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="home" color={color} size={26} />
+            <MaterialIcons name="home" color={color} size={26} />
           ),
         }}
       />
@@ -29,9 +29,20 @@ const LabScreen = () => {
         component={Details}
         options={{
           tabBarColor: "#111",
-          tabBarLabel: "Details",
+          tabBarLabel: "Lab",
           tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="home" color={color} size={26} />
+            <MaterialIcons name="home" color={color} size={26} />
+          ),
+        }}
+      />
+      <Screen
+        name="Settings"
+        component={Settings}
+        options={{
+          tabBarColor: "#111",
+          tabBarLabel: "Settings",
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="home" color={color} size={26} />
           ),
         }}
       />

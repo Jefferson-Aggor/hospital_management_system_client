@@ -1,5 +1,12 @@
 import React from "react";
-import { View, ScrollView, Text, Dimensions, StyleSheet } from "react-native";
+import {
+  View,
+  ScrollView,
+  Text,
+  Dimensions,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 
 import { LinearGradient } from "expo-linear-gradient";
 import * as Animatable from "react-native-animatable";
@@ -12,23 +19,19 @@ const labDetails = (props) => {
 
   if (props.route.params === undefined) {
     content = (
-      <View>
-        <View style={styles.header}>
-          <Text style={styles.headerText}>Lab Results</Text>
-        </View>
-        <Animatable.View animation="fadeInUpBig" style={styles.footer}>
-          <Text
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              fontSize: 30,
-              color: "#777",
-            }}
-          >
-            No Lab Results sent{" "}
-          </Text>
-        </Animatable.View>
-      </View>
+      <Animatable.View animation="fadeInUpBig" style={styles.content}>
+        <Text style={styles.content_text}>No lab results sent </Text>
+        <TouchableOpacity
+          onPress={() => props.navigation.goBack()}
+          style={{
+            paddingHorizontal: 20,
+            paddingVertical: 10,
+            backgroundColor: "black",
+          }}
+        >
+          <Text style={{ color: "#fff", textAlign: "center" }}>Back</Text>
+        </TouchableOpacity>
+      </Animatable.View>
     );
   } else {
     const {
@@ -74,14 +77,8 @@ const labDetails = (props) => {
     });
 
     content = (
-      <View>
-        <View style={styles.header}>
-          <Text style={styles.headerText}>Lab Results</Text>
-          <Text style={styles.subText}>
-            For {firstname} {lastname}{" "}
-          </Text>
-        </View>
-        <Animatable.View animation="fadeInUpBig" style={styles.footer}>
+      <View style={styles.container}>
+        <Animatable.View animation="fadeInUpBig">
           <ScrollView style={{ paddingBottom: 40 }}>
             <View style={styles.grid_2}>
               <View style={styles.lab_tests}>
@@ -115,20 +112,23 @@ const screenHeight = height;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#048ba8ff",
   },
-  header: {
-    height: screenHeight * 0.15,
+  content: {
     justifyContent: "center",
     alignItems: "center",
+    flex: 1,
   },
+  content_text: {
+    fontSize: 18,
+    color: "red",
+    fontWeight: 300,
+
+    marginBottom: 20,
+  },
+
   footer: {
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
     paddingVertical: 50,
     paddingHorizontal: 30,
-    height: screenHeight * 0.85,
   },
   dividerText: { color: "#2e4057ff", fontSize: 20, fontWeight: 200 },
   headerText: {

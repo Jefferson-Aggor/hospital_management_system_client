@@ -51,7 +51,10 @@ export const searchPatients = (userParams) => async (dispatch) => {
       payload: results.data,
     });
   } catch (err) {
-    console.log(err);
+    dispatch({
+      type: GET_ERRORS,
+      payload: { msg: "Failed to search patient" },
+    });
   }
 };
 

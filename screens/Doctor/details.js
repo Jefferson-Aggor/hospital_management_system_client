@@ -16,6 +16,8 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import * as Animatable from "react-native-animatable";
 
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Feather from "react-native-vector-icons/Feather";
 
@@ -26,25 +28,41 @@ const Details = (props) => {
     lab_tests: null,
     prescriptions: null,
   });
-  const {
-    firstname,
-    lastname,
-
-    lab_results,
-
-    _id,
-  } = props.route.params;
 
   const _onChangeText = (name) => {
     return (text) => setDiagnose({ ...diagnose, [name]: text });
   };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Details</Text>
-        <Text style={styles.subText}>Lorem, ipsum dolor.</Text>
+  let content;
+
+  if (props.route.params === undefined) {
+    content = (
+      <View style={styles.content}>
+        <Text style={styles.content_text}>
+          Please Select a patient to view details
+        </Text>
+
+        <TouchableOpacity
+          onPress={() => props.navigation.goBack()}
+          style={{
+            paddingHorizontal: 20,
+            paddingVertical: 10,
+            backgroundColor: "black",
+          }}
+        >
+          <Text style={{ color: "#fff", textAlign: "center" }}>Back</Text>
+        </TouchableOpacity>
       </View>
+    );
+  } else {
+    const {
+      firstname,
+      lastname,
+      lab_results,
+      referToLab,
+      _id,
+    } = props.route.params;
+    content = (
       <Animatable.View animation="fadeInUpBig" style={styles.footer}>
         <ScrollView style={{ paddingBottom: 40 }}>
           <View style={styles.form_group}>
@@ -121,7 +139,9 @@ const Details = (props) => {
               </View>
             </View>
           ) : (
-            <Text>Test results not ready</Text>
+            <Text style={{ fontSize: 18, color: "red" }}>
+              Test results not ready
+            </Text>
           )}
 
           {diagnose.referToLab === "no" ? (
@@ -143,27 +163,34 @@ const Details = (props) => {
             </View>
           ) : null}
 
-          <View>
-            <LinearGradient colors={["#333", "#222"]} style={styles.submit_btn}>
-              <TouchableOpacity
-                onPress={() => props.diagnosePatient(diagnose, _id)}
+          {!referToLab ? (
+            <View>
+              <LinearGradient
+                colors={["#333", "#222"]}
+                style={styles.submit_btn}
               >
-                {diagnose.referToLab === "yes" ? (
-                  <Text style={{ color: "#fff", textAlign: "center" }}>
-                    Go To Lab
-                  </Text>
-                ) : (
-                  <Text style={{ color: "#fff", textAlign: "center" }}>
-                    Diagnose
-                  </Text>
-                )}
-              </TouchableOpacity>
-            </LinearGradient>
-          </View>
+                <TouchableOpacity
+                  onPress={() => props.diagnosePatient(diagnose, _id)}
+                >
+                  {diagnose.referToLab === "yes" ? (
+                    <Text style={{ color: "#fff", textAlign: "center" }}>
+                      Go To Lab
+                    </Text>
+                  ) : (
+                    <Text style={{ color: "#fff", textAlign: "center" }}>
+                      Diagnose
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </LinearGradient>
+            </View>
+          ) : null}
         </ScrollView>
       </Animatable.View>
-    </View>
-  );
+    );
+  }
+
+  return <View style={styles.container}>{content}</View>;
 };
 
 const { width, height } = Dimensions.get("screen");
@@ -173,20 +200,25 @@ const screenHeight = height;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#048ba8ff",
   },
-  header: {
-    height: screenHeight * 0.15,
+  content: {
     justifyContent: "center",
     alignItems: "center",
+    flex: 1,
+  },
+  content_text: {
+    fontSize: 18,
+    color: "red",
+    fontWeight: 300,
+
+    marginBottom: 20,
   },
   footer: {
     backgroundColor: "#fff",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+
     paddingVertical: 50,
     paddingHorizontal: 30,
-    height: screenHeight * 0.85,
+    height: screenHeight,
   },
   dividerText: { color: "#2e4057ff", fontSize: 20, fontWeight: 200 },
   headerText: {

@@ -27,10 +27,10 @@ export const registerPatient = (userData) => async (dispatch) => {
 
         dispatch({
           type: REGISTER_PATIENT,
-          payload: userData,
+          payload: data.data,
         });
       } else {
-        dispatch(dispatchErrors(`${decoded.role} is not authorized`));
+        dispatch(dispatchErrors("Failed to register patient"));
       }
     }
   } catch (err) {
@@ -54,7 +54,7 @@ export const loginWorker = (userData) => async (dispatch) => {
       dispatch(setCurrentUser(decoded));
     }
   } catch (err) {
-    dispatchErrors("Failed to login");
+    dispatch(dispatchErrors("Failed to login"));
   }
 };
 
@@ -68,6 +68,6 @@ export const setCurrentUser = (decoded) => {
 export const dispatchErrors = (msg) => {
   return {
     type: GET_ERRORS,
-    payload: msg,
+    payload: { msg },
   };
 };

@@ -11,14 +11,15 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
+import Loading from "../../components/Loading";
 
-import Picker from "@react-native-picker/picker";
+import Moment from "react-moment";
 
 import { LinearGradient } from "expo-linear-gradient";
 import * as Animatable from "react-native-animatable";
 
-import Icon from "react-native-vector-icons/MaterialIcons";
-import Feather from "react-native-vector-icons/Feather";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { color } from "react-native-reanimated";
 
 class Consultation extends React.Component {
   componentDidMount() {
@@ -30,38 +31,102 @@ class Consultation extends React.Component {
     let content;
 
     if (patients.patients === null || isLoading) {
-      content = <Text>Loading</Text>;
+      content = <Loading />;
+    } else if (!Object.keys(patients.patients).includes("data")) {
+      content = (
+        // <View style={styles.content}>
+        //   <Text style={styles.content_text}>Error while fetching data.</Text>
+
+        // </View>
+        <View
+          style={[
+            styles.parent,
+            {
+              borderLeftColor: "red",
+              borderLeftWidth: 5,
+              marginRight: 5,
+              backgroundColor: "#f4f4f4",
+              paddingVertical: 20,
+              paddingHorizontal: 25,
+            },
+          ]}
+        >
+          <Text style={{ fontSize: 18, color: "red" }}>
+            Error while loading. Refresh page
+          </Text>
+        </View>
+      );
     } else {
       content = patients.patients.data.map((patient) => {
         if (patient.assigned_doctor === auth.user._id) {
           return (
             <TouchableOpacity
-              style={{
-                backgroundColor: patient.paid ? "#D4EDDA" : "#F8D7DA",
-                color: patient.paid ? "#588C64" : "#D8ABAF",
-              }}
               key={patient._id}
               onPress={() => {
                 return navigation.navigate("Details", patient);
               }}
             >
-              <View style={styles.card_body}>
-                <View style={styles.card_image}></View>
+              <View
+                style={[
+                  styles.card_body,
+                  styles.card,
+                  { borderLeftColor: patient.paid ? "green" : "red" },
+                ]}
+              >
                 <View style={styles.card_text}>
-                  <Text
-                    style={(styles.card_title, { textTransform: "capitalize" })}
+                  <View>
+                    <Text
+                      style={[
+                        styles.card_title,
+                        { color: patient.paid ? "green" : "red" },
+                      ]}
+                    >
+                      {patient.firstname} {patient.lastname}
+                    </Text>
+                    <Text style={styles.card_subText}>
+                      <Text>
+                        Member Since:{" "}
+                        <Moment format="DD / MM / YYYY">
+                          {patient.joinedAt}
+                        </Moment>
+                      </Text>
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{ alignItems: "center", justifyContent: "center" }}
                   >
-                    {patient.firstname} {patient.lastname}
-                  </Text>
-                  <Text style={styles.card_subText}>
-                    <Text>Member Since: {patient.joinedAt}</Text>
-                  </Text>
+                    <MaterialIcons
+                      name="navigate-next"
+                      color={patient.paid ? "green" : "red"}
+                      size={40}
+                      style={styles.icon}
+                    />
+                  </View>
                 </View>
               </View>
             </TouchableOpacity>
           );
         } else {
-          content = <Text>No patient assigned to you</Text>;
+          content = (
+            <View
+              style={[
+                styles.parent,
+                {
+                  borderLeftColor: "red",
+                  borderLeftWidth: 5,
+                  marginRight: 5,
+                  backgroundColor: "#f4f4f4",
+                  paddingVertical: 20,
+                  paddingHorizontal: 25,
+                },
+              ]}
+            >
+              <Text style={{ fontSize: 18, color: "red" }}>
+                No assigned patient yet.
+              </Text>
+            </View>
+          );
         }
       });
     }
@@ -69,19 +134,6 @@ class Consultation extends React.Component {
     return (
       <View style={styles.container}>
         <View style={styles.container}>
-          <View style={styles.header}>
-            <Text
-              style={{
-                color: "#fff",
-                fontSize: 30,
-                fontWeight: "100",
-                fontFamily: "lato",
-              }}
-            >
-              Consultation
-            </Text>
-          </View>
-
           <Animatable.View animation="fadeInUpBig">
             <View style={styles.footer}>
               <ScrollView>{content}</ScrollView>
@@ -102,18 +154,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#444",
   },
-  header: {
-    height: screenHeight * 0.15,
+  content: {
     justifyContent: "center",
     alignItems: "center",
+    flex: 1,
   },
+  content_text: {
+    fontSize: 18,
+    color: "red",
+    fontWeight: 300,
+
+    marginBottom: 20,
+  },
+
   footer: {
     backgroundColor: "#fff",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+
     paddingVertical: 50,
     paddingHorizontal: 30,
-    height: screenHeight * 0.85,
+    height: screenHeight,
+    flex: 1,
   },
   form_group: {
     flexDirection: "row",
@@ -154,39 +214,45 @@ const styles = StyleSheet.create({
     marginTop: 50,
     paddingVertical: 10,
   },
+
   card: {
     backgroundColor: "#fff",
     width: "100%",
+    marginBottom: 20,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 1,
     },
     shadowOpacity: 0.3,
-    shadowRadius: 5,
+    shadowRadius: 2,
 
     elevation: 5,
 
     marginBottom: 20,
+
+    borderLeftWidth: 5,
   },
   card_body: {
     flexDirection: "row",
     width: "100%",
   },
-  card_image: {
-    backgroundColor: "#f18f01ff",
-    width: "20%",
-  },
+
   card_text: {
     paddingVertical: 10,
-    paddingHorizontal: 10,
-    width: "80%",
+    paddingHorizontal: 15,
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   card_title: {
-    color: "#444",
-    fontSize: 20,
-    fontWeight: 500,
+    fontSize: 18,
+    fontWeight: 400,
     marginBottom: 10,
+    textTransform: "capitalize",
+  },
+  icon: {
+    alignContent: "center",
   },
 });
 
